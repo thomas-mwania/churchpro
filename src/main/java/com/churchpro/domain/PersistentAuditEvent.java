@@ -79,6 +79,11 @@ public class PersistentAuditEvent implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return 31;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -89,18 +94,9 @@ public class PersistentAuditEvent implements Serializable {
         return id != null && id.equals(((PersistentAuditEvent) o).id);
     }
 
-    @Override
-    public int hashCode() {
-        return 31;
-    }
-
     // prettier-ignore
     @Override
     public String toString() {
-        return "PersistentAuditEvent{" +
-            "principal='" + principal + '\'' +
-            ", auditEventDate=" + auditEventDate +
-            ", auditEventType='" + auditEventType + '\'' +
-            '}';
+        return "PersistentAuditEvent{" + "principal='" + principal + '\'' + ", auditEventDate=" + auditEventDate + ", auditEventType='" + auditEventType + '\'' + '}';
     }
 }

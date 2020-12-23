@@ -54,7 +54,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     @NotNull
     @Column(nullable = false)
-    private boolean activated = false;
+    private Boolean activated = false;
 
     @Size(min = 2, max = 10)
     @Column(name = "lang_key", length = 10)
@@ -205,6 +205,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return 31;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -215,23 +220,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
         return id != null && id.equals(((User) o).id);
     }
 
-    @Override
-    public int hashCode() {
-        return 31;
-    }
-
     // prettier-ignore
     @Override
     public String toString() {
-        return "User{" +
-            "login='" + login + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", imageUrl='" + imageUrl + '\'' +
-            ", activated='" + activated + '\'' +
-            ", langKey='" + langKey + '\'' +
-            ", activationKey='" + activationKey + '\'' +
-            "}";
+        return "User{" + "login='" + login + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", email='" + email + '\'' + ", imageUrl='" + imageUrl + '\'' + ", activated='" + activated + '\'' + ", langKey='" + langKey + '\'' + ", activationKey='" + activationKey + '\'' + "}";
     }
 }

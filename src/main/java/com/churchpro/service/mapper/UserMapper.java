@@ -3,13 +3,16 @@ package com.churchpro.service.mapper;
 import com.churchpro.domain.Authority;
 import com.churchpro.domain.User;
 import com.churchpro.service.dto.UserDTO;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
  * Mapper for the entity {@link User} and its DTO called {@link UserDTO}.
- *
+ * <p>
  * Normal mappers are generated using MapStruct, this one is hand-coded as MapStruct
  * support is still in beta, and requires a manual step with an IDE.
  */

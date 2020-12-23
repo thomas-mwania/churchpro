@@ -1,8 +1,10 @@
 package com.churchpro.config;
 
-import com.churchpro.security.*;
+import com.churchpro.security.AuthoritiesConstants;
 import io.github.jhipster.config.JHipsterProperties;
-import io.github.jhipster.security.*;
+import io.github.jhipster.security.AjaxAuthenticationFailureHandler;
+import io.github.jhipster.security.AjaxAuthenticationSuccessHandler;
+import io.github.jhipster.security.AjaxLogoutSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -25,9 +27,7 @@ import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 @Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final JHipsterProperties jHipsterProperties;
-
     private final RememberMeServices rememberMeServices;
-
     private final CorsFilter corsFilter;
     private final SecurityProblemSupport problemSupport;
 

@@ -15,7 +15,7 @@ import org.springframework.core.env.Profiles;
 
 /**
  * Aspect for logging execution of service and repository Spring components.
- *
+ * <p>
  * By default, it only runs with the "dev" profile.
  */
 @Aspect
@@ -60,14 +60,14 @@ public class LoggingAspect {
      * Advice that logs methods throwing exceptions.
      *
      * @param joinPoint join point for advice.
-     * @param e exception.
+     * @param e         exception.
      */
     @AfterThrowing(pointcut = "applicationPackagePointcut() && springBeanPointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
             logger(joinPoint)
                 .error(
-                    "Exception in {}() with cause = \'{}\' and exception = \'{}\'",
+                    "Exception in {}() with cause = '{}' and exception = '{}'",
                     joinPoint.getSignature().getName(),
                     e.getCause() != null ? e.getCause() : "NULL",
                     e.getMessage(),

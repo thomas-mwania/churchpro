@@ -9,12 +9,15 @@ import com.churchpro.service.MailService;
 import com.churchpro.service.UserService;
 import com.churchpro.service.dto.PasswordChangeDTO;
 import com.churchpro.service.dto.UserDTO;
-import com.churchpro.web.rest.errors.*;
+import com.churchpro.web.rest.errors.EmailAlreadyUsedException;
+import com.churchpro.web.rest.errors.InvalidPasswordException;
+import com.churchpro.web.rest.errors.LoginAlreadyUsedException;
 import com.churchpro.web.rest.vm.KeyAndPasswordVM;
 import com.churchpro.web.rest.vm.ManagedUserVM;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -29,22 +32,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class AccountResource {
-
-    private static class AccountResourceException extends RuntimeException {
-
-        private AccountResourceException(String message) {
-            super(message);
-        }
-    }
-
     private final Logger log = LoggerFactory.getLogger(AccountResource.class);
-
     private final UserRepository userRepository;
-
     private final UserService userService;
-
     private final MailService mailService;
-
     private final PersistentTokenRepository persistentTokenRepository;
 
     public AccountResource(
@@ -59,11 +50,19 @@ public class AccountResource {
         this.persistentTokenRepository = persistentTokenRepository;
     }
 
+    private static boolean checkPasswordLength(String password) {
+        return (
+            !StringUtils.isEmpty(password) &&
+            password.length() >= ManagedUserVM.PASSWORD_MIN_LENGTH &&
+            password.length() <= ManagedUserVM.PASSWORD_MAX_LENGTH
+        );
+    }
+
     /**
      * {@code POST  /register} : register the user.
      *
      * @param managedUserVM the managed user View Model.
-     * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
+     * @throws InvalidPasswordException  {@code 400 (Bad Request)} if the password is incorrect.
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already used.
      */
@@ -122,7 +121,7 @@ public class AccountResource {
      *
      * @param userDTO the current user information.
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
+     * @throws RuntimeException          {@code 500 (Internal Server Error)} if the user login wasn't found.
      */
     @PostMapping("/account")
     public void saveAccount(@Valid @RequestBody UserDTO userDTO) {
@@ -179,16 +178,16 @@ public class AccountResource {
 
     /**
      * {@code DELETE  /account/sessions?series={series}} : invalidate an existing session.
-     *
+     * <p>
      * - You can only delete your own sessions, not any other user's session
      * - If you delete one of your existing sessions, and that you are currently logged in on that session, you will
-     *   still be able to use that session, until you quit your browser: it does not work in real time (there is
-     *   no API for that), it only removes the "remember me" cookie
+     * still be able to use that session, until you quit your browser: it does not work in real time (there is
+     * no API for that), it only removes the "remember me" cookie
      * - This is also true if you invalidate your current session: you will still be able to use it until you close
-     *   your browser or that the session times out. But automatic login (the "remember me" cookie) will not work
-     *   anymore.
-     *   There is an API to invalidate the current session, but there is no API to check which session uses which
-     *   cookie.
+     * your browser or that the session times out. But automatic login (the "remember me" cookie) will not work
+     * anymore.
+     * There is an API to invalidate the current session, but there is no API to check which session uses which
+     * cookie.
      *
      * @param series the series of an existing session.
      * @throws UnsupportedEncodingException if the series couldn't be URL decoded.
@@ -232,7 +231,7 @@ public class AccountResource {
      *
      * @param keyAndPassword the generated key and the new password.
      * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the password could not be reset.
+     * @throws RuntimeException         {@code 500 (Internal Server Error)} if the password could not be reset.
      */
     @PostMapping(path = "/account/reset-password/finish")
     public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
@@ -246,11 +245,10 @@ public class AccountResource {
         }
     }
 
-    private static boolean checkPasswordLength(String password) {
-        return (
-            !StringUtils.isEmpty(password) &&
-            password.length() >= ManagedUserVM.PASSWORD_MIN_LENGTH &&
-            password.length() <= ManagedUserVM.PASSWORD_MAX_LENGTH
-        );
+    private static class AccountResourceException extends RuntimeException {
+
+        private AccountResourceException(String message) {
+            super(message);
+        }
     }
 }

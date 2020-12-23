@@ -13,7 +13,10 @@ import io.github.jhipster.security.RandomUtil;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
-
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final PersistentTokenRepository persistentTokenRepository;
-
     private final AuthorityRepository authorityRepository;
 
     public UserService(
@@ -140,7 +139,7 @@ public class UserService {
         return newUser;
     }
 
-    private boolean removeNonActivatedUser(User existingUser) {
+    private Boolean removeNonActivatedUser(User existingUser) {
         if (existingUser.getActivated()) {
             return false;
         }
@@ -332,6 +331,7 @@ public class UserService {
 
     /**
      * Gets a list of all the authorities.
+     *
      * @return a list of all the authorities.
      */
     @Transactional(readOnly = true)

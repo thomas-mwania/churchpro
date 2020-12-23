@@ -32,6 +32,11 @@ public class Authority implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -42,16 +47,9 @@ public class Authority implements Serializable {
         return Objects.equals(name, ((Authority) o).name);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(name);
-    }
-
     // prettier-ignore
     @Override
     public String toString() {
-        return "Authority{" +
-            "name='" + name + '\'' +
-            "}";
+        return "Authority{" + "name='" + name + '\'' + "}";
     }
 }

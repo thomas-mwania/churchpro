@@ -17,7 +17,6 @@ import javax.validation.constraints.Size;
 @Table(name = "jhi_persistent_token")
 public class PersistentToken implements Serializable {
     private static final long serialVersionUID = 1L;
-
     private static final int MAX_USER_AGENT_LEN = 255;
 
     @Id
@@ -96,6 +95,11 @@ public class PersistentToken implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hashCode(series);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -106,20 +110,9 @@ public class PersistentToken implements Serializable {
         return Objects.equals(series, ((PersistentToken) o).series);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(series);
-    }
-
     // prettier-ignore
     @Override
     public String toString() {
-        return "PersistentToken{" +
-            "series='" + series + '\'' +
-            ", tokenValue='" + tokenValue + '\'' +
-            ", tokenDate=" + tokenDate +
-            ", ipAddress='" + ipAddress + '\'' +
-            ", userAgent='" + userAgent + '\'' +
-            "}";
+        return "PersistentToken{" + "series='" + series + '\'' + ", tokenValue='" + tokenValue + '\'' + ", tokenDate=" + tokenDate + ", ipAddress='" + ipAddress + '\'' + ", userAgent='" + userAgent + '\'' + "}";
     }
 }

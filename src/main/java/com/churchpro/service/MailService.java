@@ -24,18 +24,12 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
  */
 @Service
 public class MailService {
-    private final Logger log = LoggerFactory.getLogger(MailService.class);
-
     private static final String USER = "user";
-
     private static final String BASE_URL = "baseUrl";
-
+    private final Logger log = LoggerFactory.getLogger(MailService.class);
     private final JHipsterProperties jHipsterProperties;
-
     private final JavaMailSender javaMailSender;
-
     private final MessageSource messageSource;
-
     private final SpringTemplateEngine templateEngine;
 
     public MailService(

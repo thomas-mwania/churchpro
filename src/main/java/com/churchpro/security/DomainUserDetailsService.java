@@ -2,7 +2,8 @@ package com.churchpro.security;
 
 import com.churchpro.domain.User;
 import com.churchpro.repository.UserRepository;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.slf4j.Logger;
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component("userDetailsService")
 public class DomainUserDetailsService implements UserDetailsService {
     private final Logger log = LoggerFactory.getLogger(DomainUserDetailsService.class);
-
     private final UserRepository userRepository;
 
     public DomainUserDetailsService(UserRepository userRepository) {

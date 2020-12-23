@@ -24,11 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AuditEventService {
     private final Logger log = LoggerFactory.getLogger(AuditEventService.class);
-
     private final JHipsterProperties jHipsterProperties;
-
     private final PersistenceAuditEventRepository persistenceAuditEventRepository;
-
     private final AuditEventConverter auditEventConverter;
 
     public AuditEventService(
@@ -43,7 +40,7 @@ public class AuditEventService {
 
     /**
      * Old audit events should be automatically deleted after 30 days.
-     *
+     * <p>
      * This is scheduled to get fired at 12:00 (am).
      */
     @Scheduled(cron = "0 0 12 * * ?")

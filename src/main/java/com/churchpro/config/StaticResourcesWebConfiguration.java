@@ -19,7 +19,6 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
         "classpath:/static/i18n/",
     };
     protected static final String[] RESOURCE_PATHS = new String[] { "/app/*", "/content/*", "/i18n/*" };
-
     private final JHipsterProperties jhipsterProperties;
 
     public StaticResourcesWebConfiguration(JHipsterProperties jHipsterProperties) {

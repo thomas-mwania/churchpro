@@ -20,7 +20,6 @@ import org.springframework.core.env.Profiles;
 @Configuration
 public class LiquibaseConfiguration {
     private final Logger log = LoggerFactory.getLogger(LiquibaseConfiguration.class);
-
     private final Environment env;
 
     public LiquibaseConfiguration(Environment env) {

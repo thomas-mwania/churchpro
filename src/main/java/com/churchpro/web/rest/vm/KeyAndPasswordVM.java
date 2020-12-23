@@ -5,7 +5,6 @@ package com.churchpro.web.rest.vm;
  */
 public class KeyAndPasswordVM {
     private String key;
-
     private String newPassword;
 
     public String getKey() {

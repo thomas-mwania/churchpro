@@ -6,7 +6,10 @@ import com.churchpro.domain.User;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  * A DTO representing a user, with his authorities.
@@ -32,19 +35,15 @@ public class UserDTO {
     @Size(max = 256)
     private String imageUrl;
 
-    private boolean activated = false;
+    private Boolean activated = false;
 
     @Size(min = 2, max = 10)
     private String langKey;
 
     private String createdBy;
-
     private Instant createdDate;
-
     private String lastModifiedBy;
-
     private Instant lastModifiedDate;
-
     private Set<String> authorities;
 
     public UserDTO() {
@@ -174,19 +173,6 @@ public class UserDTO {
     // prettier-ignore
     @Override
     public String toString() {
-        return "UserDTO{" +
-            "login='" + login + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", imageUrl='" + imageUrl + '\'' +
-            ", activated=" + activated +
-            ", langKey='" + langKey + '\'' +
-            ", createdBy=" + createdBy +
-            ", createdDate=" + createdDate +
-            ", lastModifiedBy='" + lastModifiedBy + '\'' +
-            ", lastModifiedDate=" + lastModifiedDate +
-            ", authorities=" + authorities +
-            "}";
+        return "UserDTO{" + "login='" + login + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", email='" + email + '\'' + ", imageUrl='" + imageUrl + '\'' + ", activated=" + activated + ", langKey='" + langKey + '\'' + ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", lastModifiedBy='" + lastModifiedBy + '\'' + ", lastModifiedDate=" + lastModifiedDate + ", authorities=" + authorities + "}";
     }
 }

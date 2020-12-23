@@ -8,7 +8,8 @@ import io.github.jhipster.security.PersistentTokenCache;
 import io.github.jhipster.security.RandomUtil;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -17,7 +18,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.rememberme.*;
+import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.CookieTheftException;
+import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,19 +53,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PersistentTokenRememberMeServices extends AbstractRememberMeServices {
-    private final Logger log = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
-
     // Token is valid for one month
     private static final int TOKEN_VALIDITY_DAYS = 31;
-
     private static final int TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * TOKEN_VALIDITY_DAYS;
-
     private static final long UPGRADED_TOKEN_VALIDITY_MILLIS = 5000l;
-
+    private final Logger log = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
     private final PersistentTokenCache<UpgradedRememberMeToken> upgradedTokenCache;
-
     private final PersistentTokenRepository persistentTokenRepository;
-
     private final UserRepository userRepository;
 
     public PersistentTokenRememberMeServices(
@@ -74,6 +72,34 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         this.persistentTokenRepository = persistentTokenRepository;
         this.userRepository = userRepository;
         upgradedTokenCache = new PersistentTokenCache<>(UPGRADED_TOKEN_VALIDITY_MILLIS);
+    }
+
+    @Override
+    protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
+        String login = successfulAuthentication.getName();
+
+        log.debug("Creating new persistent login for user {}", login);
+        PersistentToken token = userRepository
+            .findOneByLogin(login)
+            .map(
+                u -> {
+                    PersistentToken t = new PersistentToken();
+                    t.setSeries(RandomUtil.generateRandomAlphanumericString());
+                    t.setUser(u);
+                    t.setTokenValue(RandomUtil.generateRandomAlphanumericString());
+                    t.setTokenDate(LocalDate.now());
+                    t.setIpAddress(request.getRemoteAddr());
+                    t.setUserAgent(request.getHeader("User-Agent"));
+                    return t;
+                }
+            )
+            .orElseThrow(() -> new UsernameNotFoundException("User " + login + " was not found in the database"));
+        try {
+            persistentTokenRepository.saveAndFlush(token);
+            addCookie(token, request, response);
+        } catch (DataAccessException e) {
+            log.error("Failed to save persistent token ", e);
+        }
     }
 
     @Override
@@ -109,42 +135,14 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         }
     }
 
-    @Override
-    protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
-        String login = successfulAuthentication.getName();
-
-        log.debug("Creating new persistent login for user {}", login);
-        PersistentToken token = userRepository
-            .findOneByLogin(login)
-            .map(
-                u -> {
-                    PersistentToken t = new PersistentToken();
-                    t.setSeries(RandomUtil.generateRandomAlphanumericString());
-                    t.setUser(u);
-                    t.setTokenValue(RandomUtil.generateRandomAlphanumericString());
-                    t.setTokenDate(LocalDate.now());
-                    t.setIpAddress(request.getRemoteAddr());
-                    t.setUserAgent(request.getHeader("User-Agent"));
-                    return t;
-                }
-            )
-            .orElseThrow(() -> new UsernameNotFoundException("User " + login + " was not found in the database"));
-        try {
-            persistentTokenRepository.saveAndFlush(token);
-            addCookie(token, request, response);
-        } catch (DataAccessException e) {
-            log.error("Failed to save persistent token ", e);
-        }
-    }
-
     /**
      * When logout occurs, only invalidate the current token, and not all user sessions.
      * <p>
      * The standard Spring Security implementations are too basic: they invalidate all tokens for the
      * current user, so when he logs out from one browser, all his other sessions are destroyed.
      *
-     * @param request the request.
-     * @param response the response.
+     * @param request        the request.
+     * @param response       the response.
      * @param authentication the authentication.
      */
     @Override
@@ -201,9 +199,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
     private static class UpgradedRememberMeToken implements Serializable {
         private static final long serialVersionUID = 1L;
-
         private final String[] upgradedToken;
-
         private final String userLogin;
 
         UpgradedRememberMeToken(String[] upgradedToken, String userLogin) {
